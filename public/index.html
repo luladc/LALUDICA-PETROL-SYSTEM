@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaLuDiCa Petrol - Sistema de Gestión</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-container">
+        <div class="glass-panel login-panel">
+            <div class="logo-container" style="justify-content: center; margin-bottom: 2rem; padding: 0;">
+                <div class="logo-icon">LP</div>
+                <h1>LaLuDiCa<br><span>Petrol</span></h1>
+            </div>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">
+                Acceso al sistema de despachos<br>
+                <small style="color: var(--accent-color); font-size: 0.9rem;">(Para pruebas, usa la contraseña: <strong>1234</strong>)</small>
+            </p>
+            <form id="form-login">
+                <div class="form-group">
+                    <input type="password" id="login-password" placeholder="Contraseña" required style="text-align: center; font-size: 1.2rem;">
+                </div>
+                <button type="submit" class="btn primary-btn">Ingresar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="app-container" id="app-container" style="display: none;">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo-container">
+                <div class="logo-icon">LP</div>
+                <h1>LaLuDiCa<br><span>Petrol</span></h1>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-target="dashboard">
+                    <i>📊</i> Dashboard
+                </li>
+                <li data-target="pos">
+                    <i>⛽</i> Punto de Venta
+                </li>
+                <li data-target="supply">
+                    <i>🚚</i> Abastecimiento
+                </li>
+                <li data-target="settings">
+                    <i>⚙️</i> Configuración
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            
+            <!-- Dashboard View -->
+            <section id="dashboard" class="view-section active">
+                <header>
+                    <h2>Estado de Tanques</h2>
+                    <p>Monitoreo en tiempo real del stock de carburantes.</p>
+                </header>
+                <div class="cards-container" id="tanks-container">
+                    <!-- Tank cards will be injected here via JS -->
+                </div>
+                
+                <div class="table-container glass-panel" style="margin-top: 3rem; padding: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem; color: #a7f3d0;">Últimas Ventas (Hoy)</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="glass-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha / Hora</th>
+                                    <th>Placa</th>
+                                    <th>Tanque</th>
+                                    <th>Litros</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ventas-hoy-tbody">
+                                <!-- Injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Punto de Venta (POS) View -->
+            <section id="pos" class="view-section">
+                <header>
+                    <h2>Punto de Venta</h2>
+                    <p>Registro de ventas controladas por cupo dinámico.</p>
+                </header>
+                <div class="glass-panel form-panel pos-form-container">
+                    <form id="form-venta">
+                        <div class="form-group">
+                            <label for="pos-tanque">Tipo de Carburante / Tanque</label>
+                            <select id="pos-tanque" required>
+                                <!-- Options injected by JS -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group input-group-icon">
+                            <label for="pos-placa">Placa del Vehículo</label>
+                            <input type="text" id="pos-placa" placeholder="Ej. ABC-1234" autocomplete="off" required>
+                            <div class="limit-indicator" id="limit-indicator">
+                                <div class="status-row">
+                                    <span class="label">Estado del cliente:</span>
+                                    <span class="value" id="client-status">Habilitado</span>
+                                </div>
+                                <div class="limit-row">
+                                    <span class="label">Límite de compra permitido para esta semana:</span>
+                                    <span class="value" id="limit-value">--- L</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pos-litros">Cantidad Solicitada (Litros)</label>
+                            <input type="number" id="pos-litros" placeholder="0.00" step="0.01" min="0.01" required disabled>
+                            <small class="alert-text" id="pos-alert" style="display: none;">Alerta: Excede el límite de compra permitido.</small>
+                        </div>
+
+                        <button type="submit" class="btn primary-btn" id="btn-despachar" disabled>Procesar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Abastecimiento View -->
+            <section id="supply" class="view-section">
+                <header>
+                    <h2>Abastecimiento</h2>
+                    <p>Registro de ingresos por cisterna.</p>
+                </header>
+                <div class="glass-panel form-panel">
+                    <form id="form-ingreso">
+                        <div class="form-group">
+                            <label for="sup-tanque">Tanque Destino</label>
+                            <select id="sup-tanque" required>
+                                <!-- Options injected by JS -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sup-litros">Litros Ingresados</label>
+                            <input type="number" id="sup-litros" placeholder="Cantidad en litros" step="0.01" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sup-factura">N° Factura / Remito (Opcional)</label>
+                            <input type="text" id="sup-factura" placeholder="Ej. FAC-99812">
+                        </div>
+                        <button type="submit" class="btn primary-btn">Registrar Ingreso</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Configuración View -->
+            <section id="settings" class="view-section">
+                <header>
+                    <h2>Configuración Global</h2>
+                    <p>Parámetros de la estación y algoritmo de cupos.</p>
+                </header>
+                <div class="glass-panel form-panel">
+                    <form id="form-config">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cfg-nombre">Nombre Estación</label>
+                                <input type="text" id="cfg-nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cfg-nit">NIT</label>
+                                <input type="text" id="cfg-nit" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cfg-holgura">Factor de Holgura (%)</label>
+                                <input type="number" id="cfg-holgura" step="0.1" required>
+                                <small>Porcentaje extra sobre el promedio semanal.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="cfg-nuevos">Cupo Base Nuevos (L)</label>
+                                <input type="number" id="cfg-nuevos" step="0.1" required>
+                                <small>Límite inicial para placas sin historial.</small>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cfg-alerta">Alerta Stock Mínimo Global (L)</label>
+                            <input type="number" id="cfg-alerta" step="1" required>
+                        </div>
+                        <button type="submit" class="btn primary-btn">Guardar Cambios</button>
+                    </form>
+                </div>
+            </section>
+
+        </main>
+    </div>
+    
+    <!-- Invoice Modal -->
+    <div id="invoice-modal" class="modal-overlay">
+        <div class="invoice-box" id="invoice-content">
+            <div class="invoice-header">
+                <h2>Comprobante de Venta</h2>
+                <h3 id="inv-empresa">LaLuDiCa Petrol</h3>
+            </div>
+            <div class="invoice-body">
+                <p><strong>Fecha y Hora:</strong> <span id="inv-fecha"></span></p>
+                <p><strong>Vehículo (Placa):</strong> <span id="inv-placa"></span></p>
+                <p><strong>Tipo de Carburante:</strong> <span id="inv-tanque"></span></p>
+                <div style="margin-top: 1.5rem; border-top: 2px dashed #ccc; padding-top: 1rem; text-align: center;">
+                    <p style="font-size: 1.5rem;"><strong>Volumen Despachado:</strong></p>
+                    <p style="font-size: 2.5rem; font-weight: 800; color: #10b981;" id="inv-litros">0.00 L</p>
+                </div>
+            </div>
+            <div class="invoice-footer no-print">
+                <button class="btn primary-btn" onclick="window.print()">🖨️ Imprimir Factura</button>
+                <button class="btn" style="background: #475569; color: white;" onclick="document.getElementById('invoice-modal').classList.remove('show')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast">Notificación</div>
+
+    <script src="app.js"></script>
+</body>
+</html>
